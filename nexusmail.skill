@@ -1,0 +1,27 @@
+{
+  "name": "NexusMail Thread Optimization",
+  "id": "nexusmail_thread_opt",
+  "description": "Routes cluttered email histories over to your independent service to execute regex token shaving and assign structural priority scores.",
+  "version": "1.0.0",
+  "routing_endpoint": "http://localhost:8050/process-stream",
+  "tools": [
+    {
+      "name": "clean_email_context",
+      "description": "Strips out conversational headers, footers, and old signature blocks from raw string inputs.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "raw_body": {
+            "type": "string",
+            "description": "The raw email context string parsed from the client pipeline."
+          },
+          "sender": {
+            "type": "string",
+            "description": "The tracking email address of the conversation sender."
+          }
+        },
+        "required": ["raw_body", "sender"]
+      }
+    }
+  ]
+}
