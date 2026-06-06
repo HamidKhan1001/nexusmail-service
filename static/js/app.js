@@ -1,7 +1,33 @@
 const API = '';
 
-let stats   = { total: 0, critical: 0, routine: 0, cleaned: 0 };
+let stats   = { total: 847, critical: 63, routine: 784, cleaned: 847 };
 let history = [];
+
+const DEMO_HISTORY = [
+  { sender: 'sarah.chen@acmecorp.com',      rating: 'CRITICAL_ACTION', mode: 'AceVane_Mock_Protected', minsAgo: 2  },
+  { sender: 'james.o@partnerships.io',      rating: 'ROUTINE_READ',    mode: 'AceVane_Mock_Protected', minsAgo: 7  },
+  { sender: 'alerts@pagerduty.com',         rating: 'CRITICAL_ACTION', mode: 'AceVane_Mock_Protected', minsAgo: 14 },
+  { sender: 'mike.torres@devteam.co',       rating: 'ROUTINE_READ',    mode: 'AceVane_Mock_Protected', minsAgo: 21 },
+  { sender: 'billing@stripe.com',           rating: 'ROUTINE_READ',    mode: 'AceVane_Mock_Protected', minsAgo: 35 },
+  { sender: 'priya.nair@enterprise.com',    rating: 'CRITICAL_ACTION', mode: 'Live_Inference_Pass',    minsAgo: 48 },
+  { sender: 'noreply@github.com',           rating: 'ROUTINE_READ',    mode: 'AceVane_Mock_Protected', minsAgo: 55 },
+  { sender: 'cto@startup.xyz',              rating: 'CRITICAL_ACTION', mode: 'AceVane_Mock_Protected', minsAgo: 72 },
+  { sender: 'hr@company.com',               rating: 'ROUTINE_READ',    mode: 'AceVane_Mock_Protected', minsAgo: 90 },
+  { sender: 'devops@infra.internal',        rating: 'CRITICAL_ACTION', mode: 'Live_Inference_Pass',    minsAgo: 118 },
+  { sender: 'newsletter@producthunt.com',   rating: 'ROUTINE_READ',    mode: 'AceVane_Mock_Protected', minsAgo: 134 },
+  { sender: 'legal@contracts.io',           rating: 'ROUTINE_READ',    mode: 'AceVane_Mock_Protected', minsAgo: 201 },
+];
+
+const DEMO_RESULT = {
+  status: 'success',
+  pipeline_mode: 'AceVane_Mock_Protected',
+  purged_context: 'Hi team — production deploy is failing on the auth service. Rollback attempted at 14:32 UTC but the DB migration is blocking it. Need senior eng on this asap. Customers are seeing 503s on login.',
+  metrics: {
+    summary: 'High-priority production incident: auth service deployment failure with failed rollback. Active customer impact on login flow. Immediate engineering escalation required.',
+    priority_rating: 'CRITICAL_ACTION',
+    suggested_response_template: 'Acknowledged. Escalating to on-call senior engineer now. Will provide a status update within 15 minutes.',
+  },
+};
 
 const $ = id => document.getElementById(id);
 
@@ -216,7 +242,36 @@ function timeAgo(d) {
 }
 
 // ── Init ──
+const DEMO_EMAIL_BODY = `Hi team,
+
+Production is down on the auth service — users are getting 503s on login since 14:28 UTC. Rollback at 14:32 failed due to a blocking DB migration.
+
+URGENT — need senior eng escalation now.
+
+--------- Original Message ---------
+From: devops@infra.internal Sent: Mon 14:35
+To: engineering@company.com
+Subject: Re: [CRITICAL] Auth Service Down
+
+Confirmed. Health checks failing on all 3 pods. PagerDuty alert #8821 open.
+
+> On Mon, alerts@pagerduty.com wrote:
+> ALERT: auth-service health check CRITICAL — 3/3 pods unhealthy`;
+
+function loadDemo() {
+  $('raw-body').value = DEMO_EMAIL_BODY;
+
+  history = DEMO_HISTORY.map(d => ({
+    sender: d.sender,
+    rating: d.rating,
+    mode:   d.mode,
+    at:     new Date(Date.now() - d.minsAgo * 60 * 1000),
+  }));
+  showResult(DEMO_RESULT);
+}
+
 checkHealth();
+loadDemo();
 updateStats();
 renderHistory();
 setInterval(checkHealth, 10000);
