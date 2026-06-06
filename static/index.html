@@ -3,158 +3,253 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NexusMail Dashboard</title>
+  <title>NexusMail — Email Processor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
 
-<!-- ── Sidebar ── -->
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-icon">✉️</div>
-    <div>
-      <div class="logo-text">NexusMail</div>
-      <div class="logo-sub">Context Processor</div>
-    </div>
-  </div>
+<div class="overlay" id="overlay"></div>
 
-  <nav class="nav">
-    <button class="nav-item active">
-      <span class="icon">🏠</span> Dashboard
-    </button>
-    <button class="nav-item" onclick="window.open('/docs','_blank')">
-      <span class="icon">📄</span> API Docs
-    </button>
-    <button class="nav-item" onclick="window.open('/redoc','_blank')">
-      <span class="icon">📘</span> ReDoc
-    </button>
-    <button class="nav-item" onclick="window.open('/health','_blank')">
-      <span class="icon">❤️</span> Health Check
-    </button>
-  </nav>
+<div class="layout">
 
-  <div class="sidebar-footer">
-    <div class="status-pill">
-      <div class="dot" id="status-dot"></div>
-      <span id="status-text" style="font-size:12px;color:var(--muted)">Checking…</span>
-    </div>
-  </div>
-</aside>
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
 
-<!-- ── Main ── -->
-<div class="main">
-
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="topbar-title">Dashboard</div>
-    <div class="topbar-actions">
-      <span class="badge badge-purple">v1.0.0</span>
-      <span class="badge badge-green">Port 8050</span>
-    </div>
-  </header>
-
-  <!-- Content -->
-  <main class="content">
-
-    <!-- Stat cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">EMAILS PROCESSED</div>
-        <div class="stat-value" id="stat-total">0</div>
-        <div class="stat-delta">This session</div>
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg class="icon icon-lg" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">CRITICAL FLAGGED</div>
-        <div class="stat-value" id="stat-critical" style="color:var(--red)">0</div>
-        <div class="stat-delta">Urgent escalations</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">ROUTINE READS</div>
-        <div class="stat-value" id="stat-routine" style="color:var(--green)">0</div>
-        <div class="stat-delta">Low priority</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">THREADS CLEANED</div>
-        <div class="stat-value" id="stat-cleaned" style="color:var(--accent-hover)">0</div>
-        <div class="stat-delta">Tokens pruned</div>
+      <span class="logo-name">NexusMail</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+
+      <button class="nav-link active" onclick="closeSidebar()">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+
+      <span class="nav-section-label">Developer</span>
+
+      <button class="nav-link" onclick="window.open('/docs','_blank'); closeSidebar()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        API Reference
+      </button>
+
+      <button class="nav-link" onclick="window.open('/redoc','_blank'); closeSidebar()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        ReDoc
+      </button>
+
+      <button class="nav-link" onclick="window.open('/health','_blank'); closeSidebar()">
+        <svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Health
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="service-status">
+        <div class="status-indicator" id="status-dot"></div>
+        <span id="status-text">Checking…</span>
       </div>
     </div>
 
-    <!-- Process + Result -->
-    <div class="two-col" style="margin-bottom:20px">
+  </aside>
 
-      <!-- Process form -->
-      <div class="panel">
-        <div class="panel-header">
-          <span class="panel-title">Process Email Thread</span>
-          <span class="badge badge-purple">AceVane Engine</span>
+  <!-- ── Main ── -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger btn-ghost btn" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span>NexusMail</span>
+          <svg class="icon icon-sm" viewBox="0 0 24 24" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+          <span style="color:var(--text)">Dashboard</span>
         </div>
-        <div class="panel-body">
-          <form id="process-form">
-            <div class="form-group">
-              <label>SENDER EMAIL</label>
-              <input type="email" id="sender" placeholder="sender@example.com" required />
+      </div>
+      <div class="topbar-right">
+        <span class="chip chip-neutral" id="topbar-status">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          v1.0.0
+        </span>
+        <span class="chip chip-blue">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.08 6.08l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/></svg>
+          Port 8050
+        </span>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page">
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Total Processed</span>
+            <div class="stat-icon stat-icon-blue">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </div>
-            <div class="form-group">
-              <label>RAW EMAIL THREAD</label>
-              <textarea id="raw-body" placeholder="Paste the full email thread here, including reply headers, footers, quoted lines…" required></textarea>
+          </div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-meta">This session</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Critical Flagged</span>
+            <div class="stat-icon stat-icon-red">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
-            <div class="form-group">
-              <div class="toggle-row">
-                <span class="toggle-label">🛡️ AceVane Mock Engine (Zero Cloud Cost)</span>
-                <label class="toggle">
-                  <input type="checkbox" id="use-acevane" checked />
-                  <span class="slider"></span>
-                </label>
+          </div>
+          <div class="stat-value" id="stat-critical">0</div>
+          <div class="stat-meta">Urgent escalations</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Routine</span>
+            <div class="stat-icon stat-icon-green">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-routine">0</div>
+          <div class="stat-meta">Low priority</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Threads Cleaned</span>
+            <div class="stat-icon stat-icon-amber">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-cleaned">0</div>
+          <div class="stat-meta">Tokens pruned</div>
+        </div>
+      </div>
+
+      <!-- Process + Result -->
+      <div class="work-grid">
+
+        <!-- Input card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg class="icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Process Thread
+            </div>
+            <span class="chip chip-neutral" id="engine-chip">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Local Engine
+            </span>
+          </div>
+          <div class="card-body">
+            <form id="process-form">
+              <div class="field">
+                <label class="field-label" for="sender">Sender Address</label>
+                <input
+                  class="field-input"
+                  type="email"
+                  id="sender"
+                  placeholder="sender@company.com"
+                  required
+                  autocomplete="email"
+                />
               </div>
-            </div>
-            <button class="btn" type="submit" id="submit-btn">Process Email</button>
-          </form>
+              <div class="field">
+                <label class="field-label" for="raw-body">Raw Email Thread</label>
+                <textarea
+                  class="field-textarea"
+                  id="raw-body"
+                  placeholder="Paste the full email thread here — including reply headers, signatures, and quoted blocks…"
+                  required
+                ></textarea>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-row-label">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <div>
+                      <div style="font-size:13px;font-weight:500">Local Analysis Mode</div>
+                      <div class="field-row-sub">No external API calls</div>
+                    </div>
+                  </div>
+                  <label class="toggle-wrap">
+                    <input type="checkbox" id="use-acevane" checked onchange="updateEngineChip(this)" />
+                    <div class="toggle-track"></div>
+                    <div class="toggle-thumb"></div>
+                  </label>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-full" type="submit" id="submit-btn">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Process Email
+              </button>
+            </form>
+          </div>
+          <div class="card-footer">
+            <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Headers, signatures, and quoted blocks are stripped before analysis.
+          </div>
         </div>
-      </div>
 
-      <!-- Result -->
-      <div class="panel">
-        <div class="panel-header">
-          <span class="panel-title">Analysis Result</span>
-        </div>
-        <div class="panel-body">
-          <div id="result-panel">
-            <div class="result-empty">
-              <span class="emoji">📭</span>
-              <span>Submit an email thread to see results</span>
+        <!-- Result card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Analysis Result
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="result-panel">
+              <div class="result-empty">
+                <svg viewBox="0 0 24 24" style="color:var(--text3)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <p>Submit a thread to see analysis</p>
+              </div>
             </div>
           </div>
         </div>
+
       </div>
 
-    </div>
-
-    <!-- History table -->
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">Processing History</span>
-        <span class="badge" id="history-count" style="font-size:11px">0 entries</span>
+      <!-- History -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg class="icon" viewBox="0 0 24 24"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/></svg>
+            Processing History
+          </div>
+          <span class="chip chip-neutral" id="history-count">0 records</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sender</th>
+                <th>Priority</th>
+                <th>Pipeline</th>
+                <th>When</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <tr class="empty-row"><td colspan="4">No records yet — process an email thread to begin.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="panel-body" style="padding:0">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>SENDER</th>
-              <th>PRIORITY</th>
-              <th>PIPELINE</th>
-              <th>TIME</th>
-            </tr>
-          </thead>
-          <tbody id="history-body"></tbody>
-        </table>
-      </div>
-    </div>
 
-  </main>
-</div>
+    </main>
+  </div><!-- /main -->
+</div><!-- /layout -->
 
 <script src="/static/js/app.js"></script>
 </body>
