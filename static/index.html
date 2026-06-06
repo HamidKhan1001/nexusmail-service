@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexusMail Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">✉️</div>
+    <div>
+      <div class="logo-text">NexusMail</div>
+      <div class="logo-sub">Context Processor</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item active">
+      <span class="icon">🏠</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="window.open('/docs','_blank')">
+      <span class="icon">📄</span> API Docs
+    </button>
+    <button class="nav-item" onclick="window.open('/redoc','_blank')">
+      <span class="icon">📘</span> ReDoc
+    </button>
+    <button class="nav-item" onclick="window.open('/health','_blank')">
+      <span class="icon">❤️</span> Health Check
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="status-pill">
+      <div class="dot" id="status-dot"></div>
+      <span id="status-text" style="font-size:12px;color:var(--muted)">Checking…</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ── Main ── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-actions">
+      <span class="badge badge-purple">v1.0.0</span>
+      <span class="badge badge-green">Port 8050</span>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- Stat cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">EMAILS PROCESSED</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-delta">This session</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">CRITICAL FLAGGED</div>
+        <div class="stat-value" id="stat-critical" style="color:var(--red)">0</div>
+        <div class="stat-delta">Urgent escalations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">ROUTINE READS</div>
+        <div class="stat-value" id="stat-routine" style="color:var(--green)">0</div>
+        <div class="stat-delta">Low priority</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">THREADS CLEANED</div>
+        <div class="stat-value" id="stat-cleaned" style="color:var(--accent-hover)">0</div>
+        <div class="stat-delta">Tokens pruned</div>
+      </div>
+    </div>
+
+    <!-- Process + Result -->
+    <div class="two-col" style="margin-bottom:20px">
+
+      <!-- Process form -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Process Email Thread</span>
+          <span class="badge badge-purple">AceVane Engine</span>
+        </div>
+        <div class="panel-body">
+          <form id="process-form">
+            <div class="form-group">
+              <label>SENDER EMAIL</label>
+              <input type="email" id="sender" placeholder="sender@example.com" required />
+            </div>
+            <div class="form-group">
+              <label>RAW EMAIL THREAD</label>
+              <textarea id="raw-body" placeholder="Paste the full email thread here, including reply headers, footers, quoted lines…" required></textarea>
+            </div>
+            <div class="form-group">
+              <div class="toggle-row">
+                <span class="toggle-label">🛡️ AceVane Mock Engine (Zero Cloud Cost)</span>
+                <label class="toggle">
+                  <input type="checkbox" id="use-acevane" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <button class="btn" type="submit" id="submit-btn">Process Email</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Analysis Result</span>
+        </div>
+        <div class="panel-body">
+          <div id="result-panel">
+            <div class="result-empty">
+              <span class="emoji">📭</span>
+              <span>Submit an email thread to see results</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- History table -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Processing History</span>
+        <span class="badge" id="history-count" style="font-size:11px">0 entries</span>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>SENDER</th>
+              <th>PRIORITY</th>
+              <th>PIPELINE</th>
+              <th>TIME</th>
+            </tr>
+          </thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

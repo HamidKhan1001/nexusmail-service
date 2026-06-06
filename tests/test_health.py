@@ -1,9 +1,8 @@
 def test_root(client):
     r = client.get("/")
     assert r.status_code == 200
-    data = r.json()
-    assert data["docs"] == "/docs"
-    assert "version" in data
+    assert "text/html" in r.headers["content-type"]
+    assert "NexusMail" in r.text
 
 
 def test_health(client):

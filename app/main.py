@@ -1,9 +1,15 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.models import HealthResponse
 from app.routers import email
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
 app = FastAPI(
     title=settings.app_name,
@@ -23,10 +29,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(email.router)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-# Keep legacy /process-stream path working alongside the new router
-app.include_router(email.router, prefix="", include_in_schema=False)
+app.include_router(email.router)
 
 
 @app.get("/health", response_model=HealthResponse, tags=["System"])
@@ -38,11 +43,6 @@ async def health() -> HealthResponse:
     )
 
 
-@app.get("/", tags=["System"])
-async def root():
-    return {
-        "service": settings.app_name,
-        "version": settings.app_version,
-        "docs": "/docs",
-        "health": "/health",
-    }
+@app.get("/", include_in_schema=False)
+async def dashboard():
+    return FileResponse(STATIC_DIR / "index.html")
